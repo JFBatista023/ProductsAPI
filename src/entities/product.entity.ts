@@ -5,12 +5,9 @@ export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
   @Column()
   price_in_cents: number;
-
-  @Column({ default: 0 })
-  quantity: number;
 }
