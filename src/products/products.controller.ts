@@ -5,6 +5,7 @@ import {
   Get,
   NotFoundException,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
   ValidationPipe,
@@ -29,7 +30,7 @@ export class ProductsController {
 
   @Put(':id')
   async updateProduct(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body(new ValidationPipe()) product: ProductDTO,
   ) {
     const updatedProduct = await this.productsService.update(id, product);
@@ -42,9 +43,9 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  async deleteProduct(@Param('id') id: string) {
+  async deleteProduct(@Param('id', new ParseUUIDPipe()) id: string) {
     const deletedResult = await this.productsService.delete(id);
-    console.log(deletedResult);
+
     if (!deletedResult) {
       throw new NotFoundException({ message: 'Product not found.' });
     }
