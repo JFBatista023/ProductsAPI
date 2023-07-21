@@ -1,7 +1,16 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Product } from 'src/entities/product.entity';
-import { CreateProductDTO } from 'src/dto/create-product.dto';
+import { ProductDTO } from 'src/dto/product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -13,7 +22,21 @@ export class ProductsController {
   }
 
   @Post()
-  async createProduct(@Body() newProduct: CreateProductDTO) {
+  async createProduct(@Body(new ValidationPipe()) newProduct: ProductDTO) {
     await this.productsService.create(newProduct);
+  }
+
+  @Put(':id')
+  async updateProduct(
+    @Param('id') id: string,
+    @Body(new ValidationPipe()) product: ProductDTO,
+  ) {
+    const updatedProduct = await this.productsService.update(id, product);
+
+    if (!updatedProduct) {
+      throw new NotFoundException({ message: 'Product not found.' });
+    }
+
+    return { message: 'Product updated successfully.' };
   }
 }

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateProductDTO } from 'src/dto/create-product.dto';
+import { ProductDTO } from 'src/dto/product.dto';
 import { Product } from 'src/entities/product.entity';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 
 @Injectable()
 export class ProductsService {
@@ -15,8 +15,26 @@ export class ProductsService {
     return this.productRepository.find();
   }
 
-  async create(product: CreateProductDTO) {
+  async create(product: ProductDTO) {
     const newProduct = this.productRepository.create(product);
     await this.productRepository.save(newProduct);
+  }
+
+  async update(id: string, product: ProductDTO) {
+    try {
+      const updatedProduct = await this.productRepository.findOneBy({ id });
+
+      if (updatedProduct) {
+        updatedProduct.name = product.name;
+        updatedProduct.price_in_cents = product.price_in_cents;
+        return this.productRepository.save(updatedProduct);
+      }
+
+      return null;
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        return null;
+      }
+    }
   }
 }
