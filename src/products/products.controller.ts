@@ -24,14 +24,16 @@ export class ProductsController {
   }
 
   @Post()
-  async createProduct(@Body(new ValidationPipe()) newProduct: ProductDTO) {
+  async createProduct(
+    @Body(new ValidationPipe({ transform: true })) newProduct: ProductDTO,
+  ) {
     await this.productsService.create(newProduct);
   }
 
   @Put(':id')
   async updateProduct(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body(new ValidationPipe()) product: ProductDTO,
+    @Body(new ValidationPipe({ transform: true })) product: ProductDTO,
   ) {
     const updatedProduct = await this.productsService.update(id, product);
 
