@@ -10,4 +10,7 @@ export class Product {
 
   @Column()
   price_in_cents: number;
+
+  @Column({ default: true })
+  isActive: boolean;
 }

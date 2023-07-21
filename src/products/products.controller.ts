@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -38,5 +39,16 @@ export class ProductsController {
     }
 
     return { message: 'Product updated successfully.' };
+  }
+
+  @Delete(':id')
+  async deleteProduct(@Param('id') id: string) {
+    const deletedResult = await this.productsService.delete(id);
+    console.log(deletedResult);
+    if (!deletedResult) {
+      throw new NotFoundException({ message: 'Product not found.' });
+    }
+
+    return { message: 'Product deleted successfully.' };
   }
 }
