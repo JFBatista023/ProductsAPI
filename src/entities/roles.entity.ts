@@ -6,9 +6,9 @@ export class Role {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'enum', enum: RoleNames, default: RoleNames.USER })
+  @Column({ type: 'enum', enum: RoleNames })
   name: RoleNames;
 
-  @Column({ type: 'simple-array', default: RolePermissions.LIST_PRODUCT })
+  @Column({ type: 'simple-array', enum: RolePermissions })
   permissions: RolePermissions[];
 }
