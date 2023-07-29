@@ -5,6 +5,7 @@ import { User } from 'src/entities/user.entity';
 import { CreateUserDTO } from 'src/dto/create-user.dto';
 import { UserDTO } from 'src/dto/user.dto';
 import { compare } from 'bcrypt';
+import { jwtConstants } from 'src/constants/constants';
 
 @Injectable()
 export class AuthService {
@@ -29,10 +30,32 @@ export class AuthService {
     }
 
     const payload = { email: user.email, username: user.name, sub: user.id };
-    const token = await this.jwtService.signAsync(payload);
+    const access_token = await this.jwtService.signAsync(payload, {
+      expiresIn: jwtConstants.expiresInAccess,
+    });
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      expiresIn: jwtConstants.expiresInRefresh,
+    });
 
     return {
-      access_token: token,
+      access_token: access_token,
+      refreshToken: refreshToken,
+    };
+  }
+
+  async refreshToken(user: User) {
+    const payload = {
+      username: user.name,
+      sub: user.id,
+      email: user.email,
+    };
+
+    const access_token = await this.jwtService.signAsync(payload, {
+      expiresIn: jwtConstants.expiresInAccess,
+    });
+
+    return {
+      accessToken: access_token,
     };
   }
 

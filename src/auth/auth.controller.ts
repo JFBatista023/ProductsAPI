@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Request,
   UnauthorizedException,
   UseGuards,
   ValidationPipe,
@@ -12,13 +13,12 @@ import {
 import { AuthService } from './auth.service';
 import { CreateUserDTO } from 'src/dto/create-user.dto';
 import { UserDTO } from 'src/dto/user.dto';
-import { UnauthenticatedGuard } from './strategies/unauthenticated/unauthenticated.guard';
+import { RefreshJwtGuard } from './strategies/jwt/refresh-jwt.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @UseGuards(UnauthenticatedGuard)
   @Post('register')
   async register(
     @Body(new ValidationPipe({ transform: true })) data: CreateUserDTO,
@@ -29,7 +29,6 @@ export class AuthController {
     }
   }
 
-  @UseGuards(UnauthenticatedGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body(new ValidationPipe({ transform: true })) data: UserDTO) {
@@ -40,5 +39,11 @@ export class AuthController {
       );
     }
     return userExists;
+  }
+
+  @UseGuards(RefreshJwtGuard)
+  @Post('refresh')
+  async refresh(@Request() req) {
+    return this.authService.refreshToken(req.user);
   }
 }
